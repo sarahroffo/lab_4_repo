@@ -1,0 +1,126 @@
+---
+title: "Lab 4"
+author: "Sarah Roffo"
+date: "10/10/2017"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+---
+##Question 1: The number of points scored by each team in a tournament is normally distributed, with mean = 32 and standard deviation = 7. What is the probability of:
+
+###Question 1a: What is the probability of a team scoring 20 points or fewer? Plot the density function and shade the area: 
+
+```{r}
+pnorm(20, mean = 32, sd = 7)
+curve(dnorm(x, mean = 32, sd = 7), from = 11, to = 53)
+cord.x <- c(11, seq(11, 20, by = 0.01), 20)
+cord.y <- c(0, dnorm(seq(11, 20, 0.01), mean = 32, sd = 7), 0)
+polygon(cord.x, cord.y, col = "blue")
+```
+
+###Question 1b: What is the probability of a team scoring more than 35 points? Plot the density function and shade the area:
+
+```{r}
+pnorm(35, mean = 32, sd = 7, lower.tail = FALSE)
+curve(dnorm(x, mean = 32, sd = 7), from = 11, to = 53)
+cord.x <- c(35, seq(35, 53, by = 0.01), 53)
+cord.y <- c(0, dnorm(seq(35, 53, 0.01), mean = 32, sd = 7), 0)
+polygon(cord.x, cord.y, col = "red")
+```
+
+###Question 1c: What is the probability of a team scoring between 20 and 40 points? Plot the density function and shade the area:
+
+```{r}
+diff(pnorm(c(20, 40), mean = 32, sd = 7))
+curve(dnorm(x, mean = 32, sd = 7), from = 11, to = 53)
+cord.x <- c(20, seq(20, 40, by = 0.01), 40)
+cord.y <- c(0, dnorm(seq(20, 40, 0.01), mean = 32, sd = 7), 0)
+polygon(cord.x, cord.y, col = "green")
+```
+
+##Question 2: The number of comment per post on a social media site is exponentially distributed, with the average post recieving ten comments. What percentage of posts get:
+
+###Question 2a: What percentage of posts get fewer than three comments? Plot the density function and shade the area:
+
+```{r}
+pexp(3, rate = 1/10)
+curve(dexp(x, rate = 1/10), from = 0, to = 40)
+cord.x <- c(0, seq(0, 3, by = 0.01), 3)
+cord.y <- c(0, dexp(seq(0, 3, 0.01)), 0)
+polygon(cord.x, cord.y, col = "blue")  
+```
+
+###Question 2b: What percentage of posts has more than 20 comments? Plot the density function and shade the area:
+
+```{r}
+pexp(20, rate = 1/10, lower.tail = FALSE)
+curve(dexp(x, rate = 1/10), from = 0, to = 40)
+cord.x <- c(20, seq(20, 40, by = 0.01), 40)
+cord.y <- c(0, dexp(seq(20, 40, 0.01)), 40)
+polygon(cord.x, cord.y, col = "red")
+```
+
+###Question 2c: What percentage of posts has between five and ten comments? Plot the density function and shade the area:
+
+```{r}
+pexp(10, rate = 1/10) - pexp(5, rate = 1/10)
+curve(dexp(x, rate = 1/10), from = 0, to = 40)
+cord.x <- c(5, seq(5, 10, by = 0.01), 10)
+cord.y <- c(0, dexp(seq(5, 10, 0.01)), 0)
+polygon(cord.x, cord.y, col = "green")
+```
+
+##Question 3: Basic raster creation and calculation:
+
+###Question 3a: Create a first raster (30 rows x 30 columns) and assign values to the raster based on random values from a uniform distribution. Plot the raster and the histogram:
+
+```{r}
+library(raster)
+set.seed(126)
+a <- runif(30)
+b <- runif(30)
+ras <- raster(nrows = 30, ncols = 30, xmn = 0, xmx = a, ymn = 0, ymx = b)
+ras
+ras[] <- runif(ncell(ras))
+plot(ras)
+hist(ras)
+```
+
+###Question 3b: Create a second raster (30 rows x 30 columns) and assign values to the raster based on random values from a normal distribution. Plot the raster and the histogram:
+
+```{r}
+set.seed(130)
+x <- rnorm(30)
+y <- rnorm(30)
+ras <- raster(nrows = 30, ncols = 30, xmn = 0, xmx = x, ymn = 0, ymx = y)
+ras
+ras[] <- runif(ncell(ras))
+plot(ras)
+hist(ras)
+```
+
+###Question 3c: Create a third raster (30 rows x 30 columns) and assign values to the raster based on cell-by-cell addition of the first raster and the second raster. Plot the raster and the histogram:
+
+```{r}
+c <- a + x
+d <- b + y
+raster(nrows = 30, ncols = 30, xmn = 0, xmx = c, ymn = 0, ymx = d)
+ras
+ras[] <- runif(ncell(ras))
+plot(ras)
+hist(ras)
+```
+
+###Question 3d: Calculate the mean value of the third raster. Reclassify the third raster into a binary image: 1 (cell value > mean value) and 0 (cell value <= mean value). Save the reclassified image to your working directory as a TIFF image:
+
+```{r}
+cellStats(ras, mean) ##mean of the third raster
+ras4 <- reclassify(ras, c(0, 0.4918369, 0,    0.4918369, 1, 1))
+ras4
+plot(ras4) ##binary image
+tiff(filename = "c:\\ras4.tiff", 
+     res = 800, pointsize = 2)
+plot(ras4)
+```
+
